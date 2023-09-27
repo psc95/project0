@@ -28,6 +28,7 @@ drop sequence bbs_no_Seq;
 create sequence bbs_no_seq
 start with 1
 increment by 1
+nocycle
 nocache;
 
 delete from bbs where bbs_no=28;

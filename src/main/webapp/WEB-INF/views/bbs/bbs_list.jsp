@@ -10,6 +10,7 @@
 <link rel="stylesheet" type="text/css" href="./css/board.css" >
 </head>
 <body>
+<form method="get" action="bbs_list">
  <div id="bList_wrap">
       <h2 class="bList_title">사용자 자료실 목록</h2>
       <div class="bList_count">글개수: ${listcount}</div>
@@ -25,8 +26,20 @@
          <c:if test="${!empty blist}">
             <c:forEach var="b" items="${blist}">
                <tr>
-                  <td align="center">${b.bbs_ref}</td>
-                  <td><a
+                  <td align="center">
+                  <c:if test="${b.bbs_step == 0}"> <%--원본글일때만 글그룹 번호를 출력 --%>
+                  ${b.bbs_ref}
+                  </c:if>
+                  </td>
+                  <td>
+                  <c:if test="${b.bbs_step != 0}"> <%-- 답변글일때만 실행 : 계단형
+                  	계층형 자료실 --%>
+                  	<c:forEach begin="1" end="${b.bbs_step}" step="1">
+                  	  &nbsp;<%-- 한칸의 빈공백 처리 --%>
+                  	</c:forEach>
+                  	<img src="images/AnswerLine.gif" > <%-- 답변글 이미지 --%>
+                  </c:if>	
+                  <a
                      href="bbs_cont?bbs_no=${b.bbs_no}&state=cont&page=${page}">
                         ${b.bbs_title}</a></td>
                   <td align="center">${b.bbs_name}</td>
@@ -76,7 +89,7 @@
    [이전]&nbsp;
    </c:if>
             <c:if test="${page >1}">
-               <a href="bbs_list?page=${page-1}">[이전]</a>&nbsp;
+               <a href="bbs_list?page=${page-1}&find_field=${find_field}&find_name=${find_name}">[이전]</a>&nbsp;
    </c:if>
 
             <%--쪽번호 출력부분 --%>
@@ -84,13 +97,13 @@
                <c:if test="${a == page}"><${a}></c:if>
 
                <c:if test="${a != page}">
-                  <a href="bbs_list?page=${a}">[${a}]</a>&nbsp;
+                  <a href="bbs_list?page=${a}&find_field=${find_field}&find_name=${find_name}">[${a}]</a>&nbsp;
     </c:if>
             </c:forEach>
 
             <c:if test="${page>=maxpage}">[다음]</c:if>
             <c:if test="${page<maxpage}">
-               <a href="bbs_list?page=${page+1}">[다음]</a>
+               <a href="bbs_list?page=${page+1}&find_field=${find_field}&find_name=${find_name}">[다음]</a>
             </c:if>
          </c:if>
       </div>
@@ -98,9 +111,28 @@
       <div id="bList_menu">
          <input type="button" value="글쓰기"
             onclick="location='bbs_write?page=${page}';" />
+         <c:if test="${(!empty find_field) && (!empty find_name)}">
+           <input type="button" value="전체목록"
+           onclick="location='bbs_list?page=${page}';" >
+         </c:if>
       </div>
 
-
+	  <%-- 검색 폼 추가 --%>
+	  <div id="bFind_wrap">
+	   <select name="find_field">
+	    <option value="bbs_title"
+	      <c:if test="${find_field == 'bbs_title'}"> ${'selected'} </c:if>>
+	      <%-- find_field가 bbs_cont와 같다면 해당 목록을 선택되게 한다. --%>
+	         글제목</option>
+	      <option value="bbs_cont"
+	       <c:if test="${find_field == 'bbs_cont'}">${'selected'}
+	       </c:if>>글내용</option>
+	   </select> <input type="search" name="find_name" id="find_name"
+	   size="16" value="${find_name}" >
+	   <input type="submit" value="검색">
+	  </div>
+	  
    </div>
+</form>
 </body>
 </html>
